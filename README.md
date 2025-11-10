@@ -439,7 +439,7 @@ python manage.py dropdb
 
 ## 🎯 Các chức năng chi tiết
 
-### 1. Quản lý Sách
+### Quản lý Sách
 - Thêm/sửa/xóa sách
 - Upload ảnh bìa sách (jpg/png, max 2MB)
 - Gán tác giả và thể loại (multiple select)
@@ -447,7 +447,7 @@ python manage.py dropdb
 - Tìm kiếm theo tên, ISBN, tác giả
 - Lọc theo thể loại, nhà xuất bản, trạng thái có sẵn
 
-### 2. Quản lý Độc giả
+### Quản lý Độc giả
 - Tự động tạo mã thẻ thư viện (LIBYYYYnnnnn)
 - Quản lý thông tin: họ tên, email, SĐT, địa chỉ, ngày sinh
 - Ngày cấp thẻ và ngày hết hạn
@@ -455,7 +455,7 @@ python manage.py dropdb
 - Xem lịch sử mượn trả của độc giả
 - Export danh sách ra CSV
 
-### 3. Mượn/Trả sách
+### Mượn/Trả sách
 - Kiểm tra số lượng sách có sẵn trước khi cho mượn
 - Kiểm tra trạng thái thẻ độc giả và ngày hết hạn
 - Tự động giảm/tăng số lượng sách khi mượn/trả
@@ -464,20 +464,20 @@ python manage.py dropdb
 - Hủy phiếu mượn
 - Độc giả xem lịch sử mượn của mình
 
-### 4. Dashboard
+### Dashboard
 - Thống kê tổng quan hệ thống
 - Top sách được mượn nhiều nhất
 - Hoạt động mượn/trả gần đây
 - Cảnh báo sách quá hạn
 - Biểu đồ và charts (Chart.js)
 
-### 5. Báo cáo
+### Báo cáo
 - Biểu đồ mượn sách theo tháng (12 tháng gần nhất)
 - Top sách được mượn nhiều nhất
 - Phân bố trạng thái mượn trả
 - Export dữ liệu ra CSV
 
-### 6. Phân quyền
+### Phân quyền
 - **Superadmin**: Toàn quyền
 - **Admin**: Quản lý nhân viên, xem báo cáo
 - **Staff**: CRUD sách/tác giả/thể loại/NXB/độc giả, mượn/trả
@@ -520,152 +520,8 @@ Chỉnh sửa file `config.py` để thay đổi:
 7. **Book recommendations**: Gợi ý sách dựa trên lịch sử
 8. **Multi-language**: Hỗ trợ đa ngôn ngữ
 
-## 🐛 Troubleshooting
 
-### Lỗi khi chạy lần đầu:
-```powershell
-# Đảm bảo đã kích hoạt virtual environment
-.\venv\Scripts\activate
-
-# Cài lại dependencies
-pip install -r requirements.txt
-
-# Khởi tạo lại database
-python manage.py reset
-```
-
-### Lỗi upload file:
-- Kiểm tra folder `static/uploads/avatars` và `static/uploads/covers` tồn tại
-- Kiểm tra quyền ghi file
-- Đảm bảo file < 2MB và định dạng jpg/png/jpeg
-
-### Lỗi database:
-```powershell
-# Xóa file database cũ
-Remove-Item database\library.db
-
----
-
-## 🚀 **8. Tính năng nổi bật**
-
-### ⚡ **Auto-update Status**
-Hệ thống tự động cập nhật trạng thái phiếu mượn:
-- `borrowed` → `overdue` khi quá hạn trả
-- `overdue` → `borrowed` khi gia hạn
-- `borrowed` → `returned` khi trả sách
-
-### 📊 **Real-time Dashboard**
-- Thống kê cập nhật theo thời gian thực
-- 4 biểu đồ động với Chart.js
-- API endpoints cho AJAX requests
-- Không cần reload trang
-
-### 🔍 **Advanced Search**
-- Tìm kiếm theo nhiều trường: tên, ISBN, tác giả
-- Lọc theo thể loại, năm xuất bản, trạng thái
-- Phân trang với 10/25/50/100 items
-- Sort theo tên, ngày tạo, số lượng
-
-### 📥 **Excel Export**
-- Export danh sách độc giả ra file .xlsx
-- Tự động định dạng và style
-- Bao gồm header và filters
-- Download trực tiếp từ browser
-
-### � **Security Features**
-- Password hashing với bcrypt (cost factor 12)
-- CSRF Protection trên mọi form
-- Session timeout tự động
-- XSS prevention với Jinja2 escaping
-- SQL Injection protection với SQLAlchemy ORM
-
----
-
-## 🐛 **9. Troubleshooting**
-
-### **Lỗi thường gặp và cách khắc phục:**
-
-**1. Import Error: No module named 'flask'**
-```powershell
-# Đảm bảo đã activate virtual environment
-.\venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-**2. Database locked**
-```powershell
-# Đóng tất cả terminal đang chạy Flask
-# Xóa file database và tạo lại
-python manage.py reset
-```
-
-**3. Port 5000 đã được sử dụng**
-```powershell
-# Tìm process đang dùng port 5000
-netstat -ano | findstr :5000
-# Kill process (thay PID bằng số tìm được)
-taskkill /PID <PID> /F
-```
-
-**4. CSRF Token Missing**
-- Refresh trang (Ctrl + F5)
-- Clear browser cache
-- Kiểm tra `csrf_token()` trong form
-
-**5. Static files không load**
-```powershell
-# Xóa cache và restart
-Ctrl + Shift + R (hard refresh)
-```
-
----
-
-## 📈 **10. Kế hoạch phát triển**
-
-### **Phase 1 (Completed ✅)**
-- ✅ Xác thực người dùng và phân quyền
-- ✅ CRUD đầy đủ cho tất cả entities
-- ✅ Hệ thống mượn/trả/gia hạn sách
-- ✅ Dashboard với 4 biểu đồ
-- ✅ Export Excel
-- ✅ Responsive UI
-
-### **Phase 2 (Future)**
-- � Email notifications cho sách quá hạn
-- 📱 PWA (Progressive Web App)
-- 🔔 Real-time notifications với WebSocket
-- 📷 QR Code cho sách và thẻ độc giả
-- 💳 Thanh toán phí phạt online
-- 📱 Mobile app (React Native/Flutter)
-- 🌐 Multi-language support (VN/EN)
-- 📊 Advanced analytics và ML recommendations
-- 🔍 Full-text search với Elasticsearch
-- ☁️ Cloud deployment (AWS/Azure/Heroku)
-
----
-
-## 🤝 **11. Đóng góp (Contributing)**
-
-Chúng tôi hoan nghênh mọi đóng góp cho dự án!
-
-### **Cách đóng góp:**
-
-1. Fork repository
-2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
-
-### **Coding Standards:**
-- Follow PEP 8 for Python code
-- Use meaningful variable/function names
-- Add docstrings for functions/classes
-- Write unit tests cho features mới
-- Update README nếu cần
-
----
-
-## 📜 **12. License**
+## 📜 **8. License**
 
 Dự án này được phát triển cho mục đích học tập tại **Khoa Công nghệ Thông tin - Đại học Đại Nam**.
 
@@ -673,7 +529,7 @@ Dự án này được phát triển cho mục đích học tập tại **Khoa C
 
 ---
 
-## 📬 **13. Liên hệ**
+## 📬 **9. Liên hệ**
 
 ### **👨‍🎓 Sinh viên thực hiện**
 - **Họ tên:** Nguyễn Trọng Đàn
