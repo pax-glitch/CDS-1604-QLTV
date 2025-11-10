@@ -541,7 +541,7 @@ Dự án này được phát triển cho mục đích học tập tại **Khoa C
 - **Lớp:** CNTT 16-04
 
 ### **🏫 Đơn vị**
-- **Khoa:** Công nghệ Thông tin
+- **Khoa:** Công nghệ thông tin
 - **Trường:** Đại học Đại Nam
 - 🌐 **Website:** [dainam.edu.vn/vi/khoa-cong-nghe-thong-tin](https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin)
 - 📱 **Fanpage:** [AIoTLab - FIT DNU](https://www.facebook.com/DNUAIoTLab)
