@@ -1,117 +1,439 @@
-# Hệ thống Quản lý Thư viện MGX
+<h2 align="center">
+    <a href="https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin">
+    🎓 Faculty of Information Technology (DaiNam University)
+    </a>
+</h2>
+<h2 align="center">
+   HỆ THỐNG QUẢN LÝ THỦ VIỆN SỐ MGX
+</h2>
 
-Ứng dụng web quản lý thư viện hoàn chỉnh được xây dựng bằng Flask (Python) với SQLite database. Hệ thống bao gồm quản lý sách, tác giả, thể loại, nhà xuất bản, độc giả, mượn/trả sách, báo cáo thống kê và phân quyền người dùng.
+<div align="center">
 
-## ✨ Tính năng chính
+[![AIoTLab](https://img.shields.io/badge/AIoTLab-green?style=for-the-badge)](https://www.facebook.com/DNUAIoTLab)
+[![Faculty of Information Technology](https://img.shields.io/badge/Faculty%20of%20Information%20Technology-blue?style=for-the-badge)](https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin)
+[![DaiNam University](https://img.shields.io/badge/DaiNam%20University-orange?style=for-the-badge)](https://dainam.edu.vn)
 
-### 🔐 Xác thực & Phân quyền
-- **4 vai trò người dùng**: Superadmin, Admin, Staff, Reader
-- Đăng nhập/Đăng ký với mã hóa bcrypt
-- Session-based authentication với Flask-Login
-- Phân quyền truy cập theo vai trò
+</div>
 
-### 📚 Quản lý Tài liệu
-- **Sách**: CRUD đầy đủ với upload ảnh bìa, quản lý số lượng
-- **Tác giả**: Quản lý thông tin tác giả
-- **Thể loại**: Phân loại sách theo thể loại
-- **Nhà xuất bản**: Quản lý thông tin NXB
-- Mối quan hệ many-to-many giữa sách-tác giả và sách-thể loại
-- Tìm kiếm và lọc nâng cao
-- Phân trang server-side
+## 📖 **1. Giới thiệu hệ thống**  
+Ứng dụng **Hệ thống Quản lý Thư viện Số MGX** là một giải pháp quản lý thư viện hiện đại được xây dựng bằng **Flask (Python)** với cơ sở dữ liệu **SQLite**, cung cấp đầy đủ các chức năng quản lý sách, độc giả, mượn/trả sách và báo cáo thống kê.
 
-### 👥 Quản lý Độc giả
-- Thẻ thư viện với mã số duy nhất
-- Quản lý thông tin cá nhân, ngày hết hạn thẻ
-- Trạng thái: active, blocked, expired
-- Lịch sử mượn trả của từng độc giả
-- Export danh sách độc giả ra CSV
+- **Web-based**: Truy cập qua trình duyệt, không cần cài đặt phần mềm
+- **Multi-user**: Hỗ trợ nhiều người dùng đồng thời với phân quyền rõ ràng  
+- **Real-time**: Cập nhật trạng thái mượn/trả sách tức thời
+- **Responsive**: Giao diện thân thiện, tương thích mọi thiết bị
 
-### 📖 Mượn/Trả sách
-- Tạo phiếu mượn với kiểm tra số lượng sách
-- Xác nhận trả sách
-- Gia hạn sách (tối đa 2 lần)
-- Tự động phát hiện sách quá hạn
-- Trạng thái: Borrowed, Returned, Overdue, Cancelled
-- Quản lý số lượng sách tự động
+## ✨ **Tính năng chính**
 
-### 👨‍💼 Quản lý Nhân viên
-- Quản lý tài khoản nhân viên
-- Phân quyền vai trò
-- Kích hoạt/vô hiệu hóa tài khoản
-- Theo dõi hoạt động của nhân viên
+### 🔐 **Xác thực & Phân quyền**
+- **4 vai trò người dùng**: 
+  - 👨‍💼 **Superadmin**: Toàn quyền quản trị hệ thống
+  - 👨‍💼 **Admin**: Quản lý nội dung và người dùng
+  - 👩‍💼 **Staff**: Xử lý mượn/trả sách, quản lý độc giả
+  - 📚 **Reader**: Mượn sách, xem lịch sử cá nhân
+- 🔒 Đăng nhập/Đăng ký với mã hóa **bcrypt**
+- 🎯 Session-based authentication với **Flask-Login**
+- 🛡️ CSRF Protection toàn diện
+- 🔑 Phân quyền truy cập theo vai trò
 
-### 📊 Dashboard & Báo cáo
-- Thống kê tổng quan: tổng sách, độc giả, sách mượn, quá hạn
-- Biểu đồ mượn sách theo tháng (Chart.js)
-- Top sách được mượn nhiều nhất
-- Danh sách sách quá hạn cần xử lý
-- Hoạt động gần đây
-- API endpoints cho charts và reports
+### 📚 **Quản lý Tài liệu**
+- **Sách**: CRUD đầy đủ với upload ảnh bìa, quản lý số lượng tồn kho
+- **Tác giả**: Quản lý thông tin tiểu sử tác giả
+- **Thể loại**: Phân loại sách theo 8 thể loại đa dạng
+- **Nhà xuất bản**: Quản lý thông tin NXB, địa chỉ, liên hệ
+- 🔗 Mối quan hệ many-to-many giữa sách-tác giả và sách-thể loại
+- 🔍 Tìm kiếm và lọc nâng cao theo nhiều tiêu chí
+- 📄 Phân trang server-side hiệu quả
+- 📊 10 sách mẫu với ảnh bìa thật từ Tiki
 
-### 🎨 Giao diện
-- Thiết kế hiện đại với Bootstrap 5
-- Responsive design cho mobile/tablet
-- Dark sidebar với gradient effects
-- Animations với Animate.css
-- Font Awesome icons
-- Toast notifications
-- Modal confirmations
+### 👥 **Quản lý Độc giả**
+- 💳 Thẻ thư viện với mã số duy nhất (LIB2024XXXXX)
+- 📋 Quản lý thông tin cá nhân đầy đủ
+- 📅 Theo dõi ngày cấp thẻ, ngày hết hạn
+- 🚦 Trạng thái: **active**, **blocked**, **expired**
+- 📖 Lịch sử mượn trả chi tiết của từng độc giả
+- 📥 Export danh sách độc giả ra file Excel
+- ✅ Kiểm tra tự động thẻ hết hạn
 
-## 🚀 Cài đặt & Chạy ứng dụng
+### 📖 **Mượn/Trả sách**
+- ➕ Tạo phiếu mượn với kiểm tra số lượng sách tự động
+- ✅ Xác nhận trả sách, cập nhật số lượng tức thời
+- 🔄 Gia hạn sách (tối đa 3 lần, 7/14/21/30 ngày)
+- ⏰ Tự động phát hiện và cập nhật sách quá hạn
+- 🏷️ Trạng thái: **borrowed**, **returned**, **overdue**
+- 📊 Quản lý số lượng sách có sẵn tự động
+- ⚡ Real-time updates - không cần refresh
 
-### Yêu cầu hệ thống
-- Python 3.9 trở lên
-- pip (Python package manager)
+### 👨‍💼 **Quản lý Nhân viên**
+- 👤 Quản lý tài khoản nhân viên (staff/admin)
+- 🎭 Phân quyền vai trò linh hoạt
+- 🔓 Kích hoạt/vô hiệu hóa tài khoản
+- 📸 Upload avatar cá nhân
+- 📊 Theo dõi hoạt động và thống kê
 
-### Bước 1: Clone/Download dự án
-```bash
+### 📊 **Dashboard & Báo cáo**
+- 📈 **Thống kê tổng quan**: 
+  - Tổng số sách, độc giả, phiếu mượn
+  - Sách đang mượn, quá hạn, sắp đến hạn
+- 📉 **4 Biểu đồ động** (Chart.js):
+  - 📊 Thống kê mượn sách theo tháng (Line Chart)
+  - 🏆 Top 10 sách được mượn nhiều nhất (Bar Chart)
+  - 🎯 Thống kê theo thể loại (Doughnut Chart)
+  - 👑 Top 10 độc giả mượn nhiều nhất (Bar Chart)
+- 📋 Danh sách sách quá hạn cần xử lý
+- 🕐 Hoạt động gần đây theo thời gian thực
+- 🔌 API endpoints cho charts và reports
+
+---
+
+## 🔧 **2. Công nghệ sử dụng**  
+
+<p align="center">
+  <a href="https://www.python.org/">
+    <img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  </a>
+  <a href="https://flask.palletsprojects.com/">
+    <img src="https://img.shields.io/badge/Flask-3.0.0-000000?style=for-the-badge&logo=flask&logoColor=white" />
+  </a>
+  <a href="https://www.sqlite.org/">
+    <img src="https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white" />
+  </a>
+  <a href="https://getbootstrap.com/">
+    <img src="https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" />
+  </a>
+  <a href="https://www.chartjs.org/">
+    <img src="https://img.shields.io/badge/Chart.js-4.4-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" />
+  </a>
+  <a href="https://jinja.palletsprojects.com/">
+    <img src="https://img.shields.io/badge/Jinja2-Template-B41717?style=for-the-badge&logo=jinja&logoColor=white" />
+  </a>
+</p>
+
+### **Backend**
+- 🐍 **Python 3.9+**: Ngôn ngữ lập trình chính
+- 🌶️ **Flask 3.0.0**: Web framework nhẹ và linh hoạt
+- 🗄️ **SQLite**: Cơ sở dữ liệu nhúng, không cần cài đặt server
+- 🔐 **Flask-Login**: Quản lý session và authentication
+- 🔒 **Flask-Bcrypt**: Mã hóa mật khẩu
+- 📝 **Flask-WTF**: Form validation và CSRF protection
+- 🗃️ **Flask-SQLAlchemy**: ORM cho database operations
+- 🔄 **Flask-Migrate**: Database migration tool
+
+### **Frontend**
+- 🎨 **Bootstrap 5.3**: CSS framework responsive
+- ✨ **Animate.css**: CSS animations library
+- 🎭 **Font Awesome 6**: Icon library
+- 📊 **Chart.js 4.4**: Thư viện biểu đồ động
+- 🎯 **Jinja2**: Template engine
+- 🌐 **HTML5, CSS3, JavaScript**: Core web technologies
+
+### **Thư viện Python chính**
+```python
+Flask==3.0.0
+Flask-Login==0.6.3
+Flask-Bcrypt==1.0.1
+Flask-WTF==1.2.1
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.5
+openpyxl==3.1.2  # Excel export
+email-validator==2.1.0
+```
+
+---
+
+## 🖼️ **3. Giao diện hệ thống**  
+
+### **3.1. Trang Đăng nhập**
+<p align="center">
+  <img src="docs/login.png" alt="Giao diện đăng nhập" width="600"/>
+  <br>
+  <em>Giao diện đăng nhập: Màn hình xác thực người dùng với validation form và thông báo lỗi rõ ràng</em>
+</p>
+
+### **3.2. Dashboard - Trang chủ**
+<p align="center">
+  <img src="docs/dashboard.png" alt="Dashboard" width="600"/>
+  <br>
+  <em>Dashboard: Thống kê tổng quan với 4 card metrics chính và biểu đồ thống kê trực quan</em>
+</p>
+
+### **3.3. Quản lý Sách**
+<p align="center">
+  <img src="docs/books.png" alt="Quản lý sách" width="600"/>
+  <br>
+  <em>Quản lý sách: Danh sách sách với ảnh bìa, tìm kiếm, lọc và phân trang</em>
+</p>
+
+### **3.4. Chi tiết Sách**
+<p align="center">
+  <img src="docs/book-detail.png" alt="Chi tiết sách" width="600"/>
+  <br>
+  <em>Chi tiết sách: Hiển thị đầy đủ thông tin sách, tác giả, thể loại và lịch sử mượn</em>
+</p>
+
+### **3.5. Quản lý Mượn/Trả sách**
+<p align="center">
+  <img src="docs/borrows.png" alt="Quản lý mượn trả" width="600"/>
+  <br>
+  <em>Quản lý mượn trả: Danh sách phiếu mượn với trạng thái màu sắc, nút trả sách và gia hạn</em>
+</p>
+
+### **3.6. Sách của tôi (Reader)**
+<p align="center">
+  <img src="docs/my-borrows.png" alt="Sách của tôi" width="600"/>
+  <br>
+  <em>Sách của tôi: Độc giả xem lịch sử mượn sách cá nhân với thống kê và trạng thái</em>
+</p>
+
+### **3.7. Báo cáo & Thống kê**
+<p align="center">
+  <img src="docs/reports.png" alt="Báo cáo" width="600"/>
+  <br>
+  <em>Báo cáo: 4 biểu đồ động hiển thị thống kê mượn sách, top sách, thể loại và độc giả</em>
+</p>
+
+### **3.8. Quản lý Độc giả**
+<p align="center">
+  <img src="docs/readers.png" alt="Quản lý độc giả" width="600"/>
+  <br>
+  <em>Quản lý độc giả: Danh sách độc giả với thông tin thẻ, trạng thái và chức năng export Excel</em>
+</p>
+
+---
+
+## ⚙️ **4. Cài đặt & Chạy ứng dụng**
+
+### 📋 **4.1. Yêu cầu hệ thống**
+
+- 🐍 **Python**: Phiên bản 3.9 trở lên (khuyến nghị Python 3.10 hoặc 3.11)
+- 💻 **Hệ điều hành**: Windows, macOS, hoặc Linux
+- 🖥️ **IDE**: VS Code, PyCharm, hoặc bất kỳ text editor nào
+- 💾 **Bộ nhớ**: Tối thiểu 2GB RAM, khuyến nghị 4GB
+- 💿 **Dung lượng**: Tối thiểu 200MB trống
+
+### 📥 **4.2. Các bước cài đặt**
+
+#### **🧰 Bước 1: Chuẩn bị môi trường**
+
+**Cài đặt Python:**
+- Tải Python tại: [python.org/downloads](https://www.python.org/downloads/)
+- Kiểm tra cài đặt:
+```powershell
+python --version
+pip --version
+```
+
+**Clone hoặc Download dự án:**
+```powershell
+# Nếu có Git
+git clone https://github.com/pax-glitch/CDS-1604-QLTV.git
+cd CDS-1604-QLTV
+
+# Hoặc download ZIP và giải nén
 cd e:\cds
 ```
 
-### Bước 2: Tạo môi trường ảo (Virtual Environment)
+#### **🔧 Bước 2: Tạo môi trường ảo (Virtual Environment)**
+
 ```powershell
 # Tạo virtual environment
 python -m venv venv
 
-# Kích hoạt virtual environment
+# Kích hoạt trên Windows
 .\venv\Scripts\activate
+
+# Kích hoạt trên Linux/MacOS
+source venv/bin/activate
 ```
 
-### Bước 3: Cài đặt dependencies
+Sau khi kích hoạt, bạn sẽ thấy `(venv)` xuất hiện trước dòng lệnh.
+
+#### **📦 Bước 3: Cài đặt các thư viện cần thiết**
+
 ```powershell
 pip install -r requirements.txt
 ```
 
-### Bước 4: Cấu hình môi trường
-File `instance/.env` đã được tạo sẵn. Bạn có thể chỉnh sửa nếu cần:
-```env
-SECRET_KEY=dev-secret-key-please-change-in-production
-FLASK_ENV=development
-FLASK_APP=run.py
-DATABASE_URL=sqlite:///database/library.db
-```
+**Danh sách thư viện sẽ được cài:**
+- Flask 3.0.0
+- Flask-Login 0.6.3
+- Flask-Bcrypt 1.0.1
+- Flask-WTF 1.2.1
+- Flask-SQLAlchemy 3.1.1
+- Flask-Migrate 4.0.5
+- openpyxl 3.1.2
+- email-validator 2.1.0
 
-### Bước 5: Khởi tạo database và seed dữ liệu mẫu
+#### **🗄️ Bước 4: Khởi tạo Database**
+
 ```powershell
-# Khởi tạo database
+# Tạo cấu trúc database
 python manage.py initdb
 
-# Seed dữ liệu mẫu (bao gồm tài khoản admin)
+# Seed dữ liệu mẫu (10 sách, 3 users, 11 độc giả, 10 phiếu mượn)
 python manage.py seed
 ```
 
-### Bước 6: Chạy ứng dụng
+**Hoặc reset toàn bộ database:**
 ```powershell
-python run.py
+python manage.py reset
 ```
 
-Ứng dụng sẽ chạy tại: **http://127.0.0.1:5000**
+#### **▶️ Bước 5: Chạy ứng dụng**
 
-## 👤 Tài khoản đăng nhập mặc định
+```powershell
+# Chạy Flask development server
+python run.py
 
-Sau khi seed dữ liệu, bạn có thể đăng nhập với:
+# Hoặc sử dụng file batch trên Windows
+start.bat
+```
 
-### Superadmin
+**Server sẽ khởi động tại:**
+- 🌐 Local: `http://127.0.0.1:5000`
+- 🌐 Network: `http://192.168.x.x:5000`
+
+---
+
+## 👤 **5. Tài khoản đăng nhập mặc định**
+
+Sau khi chạy lệnh `python manage.py seed`, hệ thống tạo sẵn 3 tài khoản:
+
+| Vai trò | Username | Password | Quyền hạn |
+|---------|----------|----------|-----------|
+| 👨‍💼 **Superadmin** | `admin` | `admin123` | Toàn quyền hệ thống |
+| 👩‍💼 **Staff** | `staff` | `staff123` | Quản lý mượn/trả, độc giả |
+| 📚 **Reader** | `reader` | `reader123` | Mượn sách, xem lịch sử |
+
+### **🎯 Hướng dẫn sử dụng**
+
+**Đối với Độc giả (Reader):**
+1. Đăng nhập với `reader`/`reader123`
+2. Tìm sách trong menu "Quản lý Sách"
+3. Click vào sách → Bấm "Mượn sách này"
+4. Chọn số ngày mượn (7/14/21/30 ngày)
+5. Xem sách đã mượn trong "Sách của tôi"
+
+**Đối với Nhân viên (Staff):**
+1. Đăng nhập với `staff`/`staff123`
+2. Vào "Mượn/Trả sách" để xem tất cả phiếu
+3. Click "Trả" để xác nhận trả sách
+4. Click "Gia hạn" để gia hạn thêm thời gian
+
+**Đối với Quản trị viên (Admin):**
+1. Đăng nhập với `admin`/`admin123`
+2. Truy cập đầy đủ tất cả chức năng
+3. Quản lý sách, tác giả, thể loại, NXB
+4. Xem báo cáo và thống kê
+5. Quản lý nhân viên và độc giả
+
+---
+
+## 🗂️ **6. Cấu trúc thư mục dự án**
+
+```
+e:\cds\
+├── app/                          # Thư mục chính chứa code ứng dụng
+│   ├── __init__.py              # Khởi tạo Flask app
+│   ├── models.py                # Database models (User, Book, Reader, Borrow...)
+│   ├── routes/                  # Blueprint routes
+│   │   ├── auth.py             # Đăng nhập/Đăng ký
+│   │   ├── books.py            # Quản lý sách
+│   │   ├── authors.py          # Quản lý tác giả
+│   │   ├── genres.py           # Quản lý thể loại
+│   │   ├── publishers.py       # Quản lý NXB
+│   │   ├── readers.py          # Quản lý độc giả
+│   │   ├── borrows.py          # Mượn/Trả sách
+│   │   ├── staff.py            # Quản lý nhân viên
+│   │   ├── dashboard.py        # Trang chủ
+│   │   ├── reports.py          # Báo cáo
+│   │   └── profile.py          # Hồ sơ cá nhân
+│   ├── forms/                   # WTForms
+│   │   ├── auth_forms.py
+│   │   ├── book_forms.py
+│   │   ├── borrow_forms.py
+│   │   └── ...
+│   ├── utils/                   # Utilities
+│   │   ├── decorators.py       # @login_required, @admin_required
+│   │   └── helpers.py
+│   └── config.py               # Cấu hình ứng dụng
+├── templates/                   # Jinja2 templates
+│   ├── layout/                 
+│   │   ├── base.html           # Template gốc
+│   │   ├── sidebar.html        # Menu sidebar
+│   │   └── header.html         # Header bar
+│   ├── auth/                   # Templates đăng nhập/ký
+│   ├── books/                  # Templates sách
+│   ├── borrows/                # Templates mượn trả
+│   ├── dashboard/              # Template dashboard
+│   ├── reports/                # Templates báo cáo
+│   └── ...
+├── static/                      # Static files
+│   ├── css/                    # Custom CSS
+│   ├── js/                     # Custom JavaScript
+│   ├── img/                    # Images, icons
+│   └── uploads/                # Uploaded files (covers, avatars)
+├── instance/                    # Instance folder
+│   └── .env                    # Environment variables
+├── database/                    # Database folder
+│   └── library.db              # SQLite database
+├── migrations/                  # Flask-Migrate migrations
+├── venv/                        # Virtual environment
+├── manage.py                    # CLI management commands
+├── run.py                       # Entry point
+├── requirements.txt             # Python dependencies
+├── README.md                    # Documentation
+└── start.bat                    # Windows batch file
+```
+
+---
+
+## 📚 **7. Quản lý Database**
+
+### **CLI Commands**
+
+```powershell
+# Khởi tạo database mới
+python manage.py initdb
+
+# Seed dữ liệu mẫu
+python manage.py seed
+
+# Reset toàn bộ (drop → create → seed)
+python manage.py reset
+
+# Xóa tất cả tables
+python manage.py dropdb
+```
+
+### **Database Schema**
+
+**Các bảng chính:**
+- `users`: Tài khoản người dùng
+- `staff`: Thông tin nhân viên
+- `readers`: Thông tin độc giả
+- `books`: Sách
+- `authors`: Tác giả
+- `genres`: Thể loại
+- `publishers`: Nhà xuất bản
+- `borrows`: Phiếu mượn/trả
+- `book_authors`: Many-to-many (sách ↔ tác giả)
+- `book_genres`: Many-to-many (sách ↔ thể loại)
+- `logs`: Lịch sử hoạt động
+
+---
+
+## 🎨 **Giao diện**
+- ✨ Thiết kế hiện đại với **Bootstrap 5**
+- 📱 **Responsive design** cho mobile/tablet/desktop
+- 🎭 Dark sidebar với gradient effects
+- 🎬 Smooth animations với **Animate.css**
+- 🎯 **Font Awesome 6** icons
+- 🔔 Toast notifications
+- ✅ Modal confirmations
+- 🎨 Custom color scheme
+
+---
 - **Username**: `admin`
 - **Password**: `admin123`
 - **Quyền**: Toàn quyền quản trị hệ thống
@@ -326,32 +648,166 @@ python manage.py reset
 # Xóa file database cũ
 Remove-Item database\library.db
 
-# Tạo lại
-python manage.py initdb
-python manage.py seed
-```
+---
 
-## 📞 Hỗ trợ
+## 🚀 **8. Tính năng nổi bật**
 
-Nếu gặp vấn đề, vui lòng:
-1. Kiểm tra log trong terminal
-2. Đảm bảo đã cài đặt đúng Python version
-3. Kiểm tra tất cả dependencies đã được cài đặt
+### ⚡ **Auto-update Status**
+Hệ thống tự động cập nhật trạng thái phiếu mượn:
+- `borrowed` → `overdue` khi quá hạn trả
+- `overdue` → `borrowed` khi gia hạn
+- `borrowed` → `returned` khi trả sách
 
-## 📄 License
+### 📊 **Real-time Dashboard**
+- Thống kê cập nhật theo thời gian thực
+- 4 biểu đồ động với Chart.js
+- API endpoints cho AJAX requests
+- Không cần reload trang
 
-MIT License - Tự do sử dụng cho mục đích học tập và thương mại.
+### 🔍 **Advanced Search**
+- Tìm kiếm theo nhiều trường: tên, ISBN, tác giả
+- Lọc theo thể loại, năm xuất bản, trạng thái
+- Phân trang với 10/25/50/100 items
+- Sort theo tên, ngày tạo, số lượng
 
-## 🎉 Credits
+### 📥 **Excel Export**
+- Export danh sách độc giả ra file .xlsx
+- Tự động định dạng và style
+- Bao gồm header và filters
+- Download trực tiếp từ browser
 
-- **Flask**: Web framework
-- **Bootstrap 5**: UI framework
-- **Font Awesome**: Icons
-- **Chart.js**: Charts and graphs
-- **Animate.css**: CSS animations
+### � **Security Features**
+- Password hashing với bcrypt (cost factor 12)
+- CSRF Protection trên mọi form
+- Session timeout tự động
+- XSS prevention với Jinja2 escaping
+- SQL Injection protection với SQLAlchemy ORM
 
 ---
 
-**Developed with ❤️ by MGX Team**
+## 🐛 **9. Troubleshooting**
 
-Phiên bản: 1.0.0 | Cập nhật: 2024
+### **Lỗi thường gặp và cách khắc phục:**
+
+**1. Import Error: No module named 'flask'**
+```powershell
+# Đảm bảo đã activate virtual environment
+.\venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+**2. Database locked**
+```powershell
+# Đóng tất cả terminal đang chạy Flask
+# Xóa file database và tạo lại
+python manage.py reset
+```
+
+**3. Port 5000 đã được sử dụng**
+```powershell
+# Tìm process đang dùng port 5000
+netstat -ano | findstr :5000
+# Kill process (thay PID bằng số tìm được)
+taskkill /PID <PID> /F
+```
+
+**4. CSRF Token Missing**
+- Refresh trang (Ctrl + F5)
+- Clear browser cache
+- Kiểm tra `csrf_token()` trong form
+
+**5. Static files không load**
+```powershell
+# Xóa cache và restart
+Ctrl + Shift + R (hard refresh)
+```
+
+---
+
+## 📈 **10. Kế hoạch phát triển**
+
+### **Phase 1 (Completed ✅)**
+- ✅ Xác thực người dùng và phân quyền
+- ✅ CRUD đầy đủ cho tất cả entities
+- ✅ Hệ thống mượn/trả/gia hạn sách
+- ✅ Dashboard với 4 biểu đồ
+- ✅ Export Excel
+- ✅ Responsive UI
+
+### **Phase 2 (Future)**
+- � Email notifications cho sách quá hạn
+- 📱 PWA (Progressive Web App)
+- 🔔 Real-time notifications với WebSocket
+- 📷 QR Code cho sách và thẻ độc giả
+- 💳 Thanh toán phí phạt online
+- 📱 Mobile app (React Native/Flutter)
+- 🌐 Multi-language support (VN/EN)
+- 📊 Advanced analytics và ML recommendations
+- 🔍 Full-text search với Elasticsearch
+- ☁️ Cloud deployment (AWS/Azure/Heroku)
+
+---
+
+## 🤝 **11. Đóng góp (Contributing)**
+
+Chúng tôi hoan nghênh mọi đóng góp cho dự án!
+
+### **Cách đóng góp:**
+
+1. Fork repository
+2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Tạo Pull Request
+
+### **Coding Standards:**
+- Follow PEP 8 for Python code
+- Use meaningful variable/function names
+- Add docstrings for functions/classes
+- Write unit tests cho features mới
+- Update README nếu cần
+
+---
+
+## 📜 **12. License**
+
+Dự án này được phát triển cho mục đích học tập tại **Khoa Công nghệ Thông tin - Đại học Đại Nam**.
+
+© 2024 - Đại học Đại Nam. All rights reserved.
+
+---
+
+## 📬 **13. Liên hệ**
+
+### **👨‍🎓 Sinh viên thực hiện**
+- **Họ tên:** Nguyễn Văn A
+- **Mã sinh viên:** 2024XXXXXX
+- **Lớp:** CNTT 16-04
+- **Khóa:** 2024-2028
+
+### **🏫 Đơn vị**
+- **Khoa:** Công nghệ Thông tin
+- **Trường:** Đại học Đại Nam
+- 🌐 **Website:** [dainam.edu.vn/vi/khoa-cong-nghe-thong-tin](https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin)
+- 📱 **Fanpage:** [AIoTLab - FIT DNU](https://www.facebook.com/DNUAIoTLab)
+- 📧 **Email:** contact@example.com
+- 📞 **Hotline:** 0123-456-789
+
+### **🔗 Repository**
+- **GitHub:** [github.com/pax-glitch/CDS-1604-QLTV](https://github.com/pax-glitch/CDS-1604-QLTV)
+- **Issues:** [github.com/pax-glitch/CDS-1604-QLTV/issues](https://github.com/pax-glitch/CDS-1604-QLTV/issues)
+
+---
+
+<div align="center">
+
+### ⭐ **Nếu bạn thấy dự án hữu ích, hãy cho một Star nhé!** ⭐
+
+**Made with ❤️ by Students of DaiNam University**
+
+[![GitHub stars](https://img.shields.io/github/stars/pax-glitch/CDS-1604-QLTV?style=social)](https://github.com/pax-glitch/CDS-1604-QLTV)
+[![GitHub forks](https://img.shields.io/github/forks/pax-glitch/CDS-1604-QLTV?style=social)](https://github.com/pax-glitch/CDS-1604-QLTV/fork)
+
+**Phiên bản: 1.0.0 | Cập nhật: November 2024**
+
+</div>
