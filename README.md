@@ -178,21 +178,15 @@ email-validator==2.1.0
   <em>Quản lý mượn trả: Danh sách phiếu mượn với trạng thái màu sắc, nút trả sách và gia hạn</em>
 </p>
 
-### **3.6. Sách của tôi (Reader)**
-<p align="center">
-  <img src="docs/my-borrows.png" alt="Sách của tôi" width="600"/>
-  <br>
-  <em>Sách của tôi: Độc giả xem lịch sử mượn sách cá nhân với thống kê và trạng thái</em>
-</p>
 
-### **3.7. Báo cáo & Thống kê**
+### **3.6. Báo cáo & Thống kê**
 <p align="center">
   <img src="docs/reports.png" alt="Báo cáo" width="600"/>
   <br>
   <em>Báo cáo: 4 biểu đồ động hiển thị thống kê mượn sách, top sách, thể loại và độc giả</em>
 </p>
 
-### **3.8. Quản lý Độc giả**
+### **3.7. Quản lý Độc giả**
 <p align="center">
   <img src="docs/readers.png" alt="Quản lý độc giả" width="600"/>
   <br>
@@ -443,66 +437,6 @@ python manage.py dropdb
 - **Password**: `staff123`
 - **Quyền**: Quản lý mượn/trả, CRUD sách, tác giả, độc giả
 
-## 📁 Cấu trúc dự án
-
-```
-library_app/
-├── app/
-│   ├── __init__.py           # App factory
-│   ├── models.py             # Database models
-│   ├── forms/                # WTForms
-│   │   ├── auth_forms.py
-│   │   ├── library_forms.py
-│   │   ├── book_forms.py
-│   │   ├── reader_forms.py
-│   │   └── borrow_forms.py
-│   ├── routes/               # Blueprint routes
-│   │   ├── auth.py
-│   │   ├── dashboard.py
-│   │   ├── authors.py
-│   │   ├── genres.py
-│   │   ├── publishers.py
-│   │   ├── books.py
-│   │   ├── readers.py
-│   │   ├── staff.py
-│   │   ├── borrows.py
-│   │   ├── profile.py
-│   │   └── reports.py
-│   └── utils/                # Utilities
-│       ├── decorators.py     # Role decorators
-│       ├── helpers.py        # Helper functions
-│       └── filters.py        # Jinja filters
-├── templates/
-│   ├── layout/
-│   │   ├── base.html
-│   │   ├── sidebar.html
-│   │   └── header.html
-│   ├── auth/
-│   ├── dashboard/
-│   ├── authors/
-│   ├── genres/
-│   ├── publishers/
-│   ├── books/
-│   ├── readers/
-│   ├── borrows/
-│   ├── staff/
-│   ├── profile/
-│   └── reports/
-├── static/
-│   └── uploads/
-│       ├── avatars/          # User avatars
-│       └── covers/           # Book covers
-├── database/
-│   └── library.db            # SQLite database
-├── instance/
-│   └── .env                  # Environment config
-├── config.py                 # App configuration
-├── requirements.txt          # Dependencies
-├── run.py                    # Application entry point
-├── manage.py                 # Management commands
-└── README.md                 # This file
-```
-
 ## 🎯 Các chức năng chi tiết
 
 ### 1. Quản lý Sách
@@ -564,44 +498,6 @@ python manage.py dropdb
 # Reset database (xóa và tạo lại + seed)
 python manage.py reset
 ```
-
-## 📝 Database Schema
-
-### Users
-- id, username, email, password, full_name, role, avatar, is_active, created_at
-
-### Authors
-- id, name, bio, created_at
-
-### Genres
-- id, name, description, created_at
-
-### Publishers
-- id, name, address, contact, created_at
-
-### Books
-- id, title, isbn, publisher_id, published_year, cover_image, description
-- total_quantity, available_quantity, created_at
-
-### Readers
-- id, user_id, card_number, full_name, email, phone, address
-- date_of_birth, card_issue_date, card_expiry_date, status, created_at
-
-### Staff
-- id, user_id, position, branch, created_at
-
-### Borrows
-- id, reader_id, book_id, staff_id, borrow_date, due_date, return_date
-- status, renew_count, created_at
-
-### BookAuthors (Many-to-Many)
-- book_id, author_id
-
-### BookGenres (Many-to-Many)
-- book_id, genre_id
-
-### Logs
-- id, user_id, action, detail, created_at
 
 ## 🔧 Tùy chỉnh cấu hình
 
@@ -773,17 +669,16 @@ Chúng tôi hoan nghênh mọi đóng góp cho dự án!
 
 Dự án này được phát triển cho mục đích học tập tại **Khoa Công nghệ Thông tin - Đại học Đại Nam**.
 
-© 2024 - Đại học Đại Nam. All rights reserved.
+© 2025 - Đại học Đại Nam. All rights reserved.
 
 ---
 
 ## 📬 **13. Liên hệ**
 
 ### **👨‍🎓 Sinh viên thực hiện**
-- **Họ tên:** Nguyễn Văn A
-- **Mã sinh viên:** 2024XXXXXX
+- **Họ tên:** Nguyễn Trọng Đàn
+- **Mã sinh viên:** 1671020077
 - **Lớp:** CNTT 16-04
-- **Khóa:** 2024-2028
 
 ### **🏫 Đơn vị**
 - **Khoa:** Công nghệ Thông tin
@@ -791,7 +686,7 @@ Dự án này được phát triển cho mục đích học tập tại **Khoa C
 - 🌐 **Website:** [dainam.edu.vn/vi/khoa-cong-nghe-thong-tin](https://dainam.edu.vn/vi/khoa-cong-nghe-thong-tin)
 - 📱 **Fanpage:** [AIoTLab - FIT DNU](https://www.facebook.com/DNUAIoTLab)
 - 📧 **Email:** contact@example.com
-- 📞 **Hotline:** 0123-456-789
+
 
 ### **🔗 Repository**
 - **GitHub:** [github.com/pax-glitch/CDS-1604-QLTV](https://github.com/pax-glitch/CDS-1604-QLTV)
@@ -808,6 +703,5 @@ Dự án này được phát triển cho mục đích học tập tại **Khoa C
 [![GitHub stars](https://img.shields.io/github/stars/pax-glitch/CDS-1604-QLTV?style=social)](https://github.com/pax-glitch/CDS-1604-QLTV)
 [![GitHub forks](https://img.shields.io/github/forks/pax-glitch/CDS-1604-QLTV?style=social)](https://github.com/pax-glitch/CDS-1604-QLTV/fork)
 
-**Phiên bản: 1.0.0 | Cập nhật: November 2024**
 
 </div>
