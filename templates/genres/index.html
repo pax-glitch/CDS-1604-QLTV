@@ -1,0 +1,60 @@
+{% extends 'layout/base.html' %}
+{% block title %}Danh sách thể loại - Thư viện MGX{% endblock %}
+{% block content %}
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div><h1 class="page-title"><i class="fas fa-tags me-2"></i>Quản lý Thể loại</h1></div>
+        <a href="{{ url_for('genres.create') }}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Thêm thể loại</a>
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-9">
+                <input type="text" name="q" class="form-control" placeholder="Tìm kiếm thể loại..." value="{{ q }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-secondary w-100"><i class="fas fa-search me-2"></i>Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead><tr><th>ID</th><th>Tên thể loại</th><th>Mô tả</th><th>Ngày tạo</th><th class="text-end">Hành động</th></tr></thead>
+                <tbody>
+                    {% for genre in genres %}
+                    <tr>
+                        <td>{{ genre.id }}</td>
+                        <td class="fw-semibold">{{ genre.name }}</td>
+                        <td>{{ genre.description[:50] if genre.description }}...</td>
+                        <td><small>{{ genre.created_at|datetime }}</small></td>
+                        <td class="text-end">
+                            <a href="{{ url_for('genres.edit', id=genre.id) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                            <form method="POST" action="{{ url_for('genres.delete', id=genre.id) }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?')"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">Không tìm thấy thể loại nào</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if pagination.pages > 1 %}
+        <nav class="mt-4"><ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}<li class="page-item"><a class="page-link" href="?page={{ pagination.prev_num }}&q={{ q }}">Trước</a></li>{% endif %}
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1) %}
+                {% if page_num %}<li class="page-item {% if page_num == pagination.page %}active{% endif %}"><a class="page-link" href="?page={{ page_num }}&q={{ q }}">{{ page_num }}</a></li>
+                {% else %}<li class="page-item disabled"><span class="page-link">...</span></li>{% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}<li class="page-item"><a class="page-link" href="?page={{ pagination.next_num }}&q={{ q }}">Sau</a></li>{% endif %}
+        </ul></nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

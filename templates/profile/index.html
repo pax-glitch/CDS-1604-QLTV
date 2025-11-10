@@ -1,0 +1,143 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Hồ sơ - Thư viện MGX{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <h1 class="page-title"><i class="fas fa-user-circle me-2"></i>Hồ sơ cá nhân</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card text-center">
+            <div class="card-body py-5">
+                {% if current_user.avatar %}
+                <img src="{{ url_for('static', filename='uploads/avatars/' + current_user.avatar) }}" 
+                     class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ current_user.full_name }}&background=4f46e5&color=fff&size=150" 
+                     class="rounded-circle mb-3" width="150" height="150">
+                {% endif %}
+                <h4 class="fw-bold mb-2">{{ current_user.full_name }}</h4>
+                <span class="badge bg-{{ current_user.role|role_badge }} mb-3">
+                    {% if current_user.role == 'superadmin' %}Super Admin
+                    {% elif current_user.role == 'admin' %}Quản trị viên
+                    {% elif current_user.role == 'staff' %}Nhân viên
+                    {% else %}Độc giả{% endif %}
+                </span>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('profile.edit') }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa hồ sơ
+                    </a>
+                    <a href="{{ url_for('profile.change_password') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2"></i>Thông tin chi tiết</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="200">Tên đăng nhập:</th>
+                        <td>{{ current_user.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ current_user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Họ và tên:</th>
+                        <td>{{ current_user.full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Vai trò:</th>
+                        <td>
+                            <span class="badge bg-{{ current_user.role|role_badge }}">
+                                {% if current_user.role == 'superadmin' %}Super Admin
+                                {% elif current_user.role == 'admin' %}Quản trị viên
+                                {% elif current_user.role == 'staff' %}Nhân viên
+                                {% else %}Độc giả{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Trạng thái:</th>
+                        <td>
+                            <span class="badge bg-{% if current_user.is_active %}success{% else %}danger{% endif %}">
+                                {% if current_user.is_active %}Hoạt động{% else %}Vô hiệu hóa{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Ngày tạo:</th>
+                        <td>{{ current_user.created_at|datetime }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {% if current_user.reader %}
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-id-card me-2"></i>Thông tin thẻ độc giả</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="200">Mã thẻ:</th>
+                        <td><code>{{ current_user.reader.card_number }}</code></td>
+                    </tr>
+                    <tr>
+                        <th>Ngày cấp thẻ:</th>
+                        <td>{{ current_user.reader.card_issue_date|date }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ngày hết hạn:</th>
+                        <td>
+                            {{ current_user.reader.card_expiry_date|date }}
+                            {% if current_user.reader.is_card_expired %}
+                                <span class="badge bg-danger ms-2">Đã hết hạn</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Trạng thái thẻ:</th>
+                        <td><span class="badge bg-{{ current_user.reader.status|status_badge }}">{{ current_user.reader.status }}</span></td>
+                    </tr>
+                </table>
+                <a href="{{ url_for('borrows.my_borrows') }}" class="btn btn-primary">
+                    <i class="fas fa-history me-2"></i>Xem lịch sử mượn
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if current_user.staff %}
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-user-tie me-2"></i>Thông tin nhân viên</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="200">Chức vụ:</th>
+                        <td>{{ current_user.staff.position }}</td>
+                    </tr>
+                    <tr>
+                        <th>Chi nhánh:</th>
+                        <td>{{ current_user.staff.branch }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

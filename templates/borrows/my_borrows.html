@@ -1,0 +1,180 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Sách của tôi - Thư viện MGX{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <h1 class="page-title animate__animated animate__fadeInDown">
+        <i class="fas fa-book-reader me-2"></i>Sách của tôi
+    </h1>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-book fa-2x text-primary mb-2"></i>
+                <h3 class="mb-0">{{ borrows|selectattr('status', 'equalto', 'borrowed')|list|length }}</h3>
+                <p class="text-muted mb-0">Đang mượn</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                <h3 class="mb-0">{{ borrows|selectattr('status', 'equalto', 'overdue')|list|length }}</h3>
+                <p class="text-muted mb-0">Quá hạn</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <h3 class="mb-0">{{ borrows|selectattr('status', 'equalto', 'borrowed')|selectattr('days_until_due', 'le', 3)|list|length }}</h3>
+                <p class="text-muted mb-0">Sắp hết hạn</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <h3 class="mb-0">{{ borrows|selectattr('status', 'equalto', 'returned')|list|length }}</h3>
+                <p class="text-muted mb-0">Đã trả</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Borrows Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Lịch sử mượn sách</h5>
+    </div>
+    <div class="card-body">
+        {% if borrows %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã phiếu</th>
+                        <th>Sách</th>
+                        <th>Ngày mượn</th>
+                        <th>Hạn trả</th>
+                        <th>Ngày trả</th>
+                        <th>Trạng thái</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for borrow in borrows %}
+                    <tr>
+                        <td><strong>#{{ borrow.id }}</strong></td>
+                        <td>
+                            <a href="{{ url_for('books.detail', id=borrow.book_id) }}" class="text-decoration-none">
+                                <strong>{{ borrow.book.title }}</strong>
+                            </a>
+                            {% if borrow.book.authors %}
+                            <br><small class="text-muted">
+                                {{ borrow.book.authors[0].author.name }}
+                            </small>
+                            {% endif %}
+                        </td>
+                        <td>{{ borrow.borrow_date.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {{ borrow.due_date.strftime('%d/%m/%Y') }}
+                            {% if borrow.status == 'borrowed' and borrow.days_until_due <= 3 and borrow.days_until_due > 0 %}
+                                <br><span class="badge bg-warning">Còn {{ borrow.days_until_due }} ngày</span>
+                            {% elif borrow.status == 'overdue' %}
+                                <br><span class="badge bg-danger">Trễ {{ borrow.days_overdue }} ngày</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if borrow.return_date %}
+                                {{ borrow.return_date.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if borrow.status == 'borrowed' %}
+                                <span class="badge bg-primary">Đang mượn</span>
+                            {% elif borrow.status == 'overdue' %}
+                                <span class="badge bg-danger">Quá hạn</span>
+                            {% elif borrow.status == 'returned' %}
+                                <span class="badge bg-success">Đã trả</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ borrow.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if borrow.status == 'overdue' %}
+                                <small class="text-danger">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Vui lòng trả sách sớm
+                                </small>
+                            {% elif borrow.status == 'borrowed' and borrow.days_until_due <= 3 %}
+                                <small class="text-warning">
+                                    <i class="fas fa-bell"></i>
+                                    Sắp đến hạn
+                                </small>
+                            {% elif borrow.renew_count > 0 %}
+                                <small class="text-muted">
+                                    Đã gia hạn {{ borrow.renew_count }} lần
+                                </small>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('borrows.my_borrows', page=pagination.prev_num) if pagination.has_prev else '#' }}">Trước</a>
+                </li>
+                
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('borrows.my_borrows', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('borrows.my_borrows', page=pagination.next_num) if pagination.has_next else '#' }}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Bạn chưa mượn sách nào</h5>
+            <p class="text-muted mb-4">Hãy khám phá thư viện và mượn sách yêu thích của bạn!</p>
+            <a href="{{ url_for('books.index') }}" class="btn btn-primary">
+                <i class="fas fa-search me-2"></i>Tìm sách
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Info Alert -->
+<div class="alert alert-info mt-4">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>Lưu ý:</strong> Vui lòng trả sách đúng hạn để tránh bị khóa thẻ. Nếu cần gia hạn, vui lòng liên hệ thủ thư.
+</div>
+{% endblock %}

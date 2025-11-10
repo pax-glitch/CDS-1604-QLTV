@@ -1,0 +1,225 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}{{ book.title }} - Thư viện MGX{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('books.index') }}">Sách</a></li>
+                <li class="breadcrumb-item active">{{ book.title }}</li>
+            </ol>
+        </nav>
+        {% if current_user.role in ['admin', 'staff', 'superadmin'] %}
+        <div>
+            <a href="{{ url_for('books.edit', id=book.id) }}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Sửa
+            </a>
+            <form method="POST" action="{{ url_for('books.delete', id=book.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Xác nhận xóa sách này?')">
+                    <i class="fas fa-trash me-2"></i>Xóa
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card sticky-top" style="top: 100px;">
+            {% if book.cover_image %}
+                {% if book.cover_image.startswith('http') %}
+                <img src="{{ book.cover_image }}" class="card-img-top" alt="{{ book.title }}" style="max-height: 500px; object-fit: cover;">
+                {% else %}
+                <img src="{{ url_for('static', filename='uploads/covers/' + book.cover_image) }}" class="card-img-top" alt="{{ book.title }}" style="max-height: 500px; object-fit: cover;">
+                {% endif %}
+            {% else %}
+            <div class="bg-gradient text-white d-flex align-items-center justify-content-center" style="height: 400px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-book fa-5x"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-{% if book.is_available %}success{% else %}danger{% endif %} fs-6">
+                        {{ book.available_quantity }}/{{ book.total_quantity }} có sẵn
+                    </span>
+                    {% if book.published_year %}
+                    <span class="text-muted">Năm {{ book.published_year }}</span>
+                    {% endif %}
+                </div>
+                {% if current_user.role in ['admin', 'staff', 'superadmin'] and book.is_available %}
+                <a href="{{ url_for('borrows.create') }}?book_id={{ book.id }}" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-hand-holding me-2"></i>Cho mượn sách
+                </a>
+                {% elif current_user.role == 'reader' and book.is_available %}
+                <button type="button" class="btn btn-success w-100 mb-2" data-bs-toggle="modal" data-bs-target="#borrowRequestModal">
+                    <i class="fas fa-book-reader me-2"></i>Mượn sách này
+                </button>
+                {% elif not book.is_available %}
+                <button class="btn btn-secondary w-100 mb-2" disabled>
+                    <i class="fas fa-times-circle me-2"></i>Hết sách
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="fw-bold mb-3">{{ book.title }}</h2>
+                
+                <div class="mb-3">
+                    <strong><i class="fas fa-user-edit me-2 text-primary"></i>Tác giả:</strong>
+                    {% for book_author in book.authors %}
+                        <span class="badge bg-primary me-1">{{ book_author.author.name }}</span>
+                    {% else %}
+                        <span class="text-muted">Chưa có thông tin</span>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <strong><i class="fas fa-tags me-2 text-success"></i>Thể loại:</strong>
+                    {% for book_genre in book.genres %}
+                        <span class="badge bg-success me-1">{{ book_genre.genre.name }}</span>
+                    {% else %}
+                        <span class="text-muted">Chưa có thông tin</span>
+                    {% endfor %}
+                </div>
+
+                {% if book.publisher %}
+                <div class="mb-3">
+                    <strong><i class="fas fa-building me-2 text-info"></i>Nhà xuất bản:</strong>
+                    {{ book.publisher.name }}
+                </div>
+                {% endif %}
+
+                {% if book.isbn %}
+                <div class="mb-3">
+                    <strong><i class="fas fa-barcode me-2"></i>ISBN:</strong>
+                    <code>{{ book.isbn }}</code>
+                </div>
+                {% endif %}
+
+                <hr>
+
+                <h5 class="fw-bold mb-3">Mô tả</h5>
+                {% if book.description %}
+                <p class="text-muted" style="text-align: justify;">{{ book.description }}</p>
+                {% else %}
+                <p class="text-muted fst-italic">Chưa có mô tả cho sách này.</p>
+                {% endif %}
+
+                <hr>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="bg-light p-3 rounded">
+                            <h6 class="fw-bold mb-2">Tổng số lượng</h6>
+                            <h3 class="text-primary mb-0">{{ book.total_quantity }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="bg-light p-3 rounded">
+                            <h6 class="fw-bold mb-2">Đang mượn</h6>
+                            <h3 class="text-warning mb-0">{{ book.total_quantity - book.available_quantity }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if current_user.role in ['admin', 'staff', 'superadmin'] %}
+        <!-- Borrow History -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-history me-2"></i>Lịch sử mượn</h5>
+            </div>
+            <div class="card-body">
+                {% if book.borrows.all() %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Độc giả</th>
+                                <th>Ngày mượn</th>
+                                <th>Hạn trả</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrow in book.borrows[:10] %}
+                            <tr>
+                                <td>{{ borrow.reader.full_name }}</td>
+                                <td><small>{{ borrow.borrow_date.strftime('%d/%m/%Y') if borrow.borrow_date else '-' }}</small></td>
+                                <td><small>{{ borrow.due_date.strftime('%d/%m/%Y') if borrow.due_date else '-' }}</small></td>
+                                <td>
+                                    {% if borrow.status == 'borrowed' %}
+                                        <span class="badge bg-primary">Đang mượn</span>
+                                    {% elif borrow.status in ['overdue', 'Overdue'] %}
+                                        <span class="badge bg-danger">Quá hạn</span>
+                                    {% elif borrow.status == 'returned' %}
+                                        <span class="badge bg-success">Đã trả</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ borrow.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">Chưa có lịch sử mượn</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Borrow Request Modal for Readers -->
+{% if current_user.role == 'reader' %}
+<div class="modal fade" id="borrowRequestModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yêu cầu mượn sách</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{{ url_for('borrows.reader_request', book_id=book.id) }}">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Sách:</strong></label>
+                        <p class="text-muted">{{ book.title }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Số ngày mượn:</strong></label>
+                        <select name="borrow_days" class="form-select" required>
+                            <option value="7">7 ngày</option>
+                            <option value="14" selected>14 ngày (khuyến nghị)</option>
+                            <option value="21">21 ngày</option>
+                            <option value="30">30 ngày</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Yêu cầu của bạn sẽ được xử lý bởi thủ thư. Vui lòng kiểm tra thường xuyên để biết trạng thái.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane me-2"></i>Gửi yêu cầu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

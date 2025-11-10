@@ -1,0 +1,154 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Quản lý bạn đọc{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Quản lý bạn đọc</h2>
+    <div>
+        <a href="{{ url_for('readers.export') }}" class="btn btn-success me-2">
+            <i class="fas fa-file-excel"></i> Xuất Excel
+        </a>
+        <a href="{{ url_for('readers.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm bạn đọc
+        </a>
+    </div>
+</div>
+
+<!-- Search & Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" name="q" value="{{ q }}" placeholder="Tìm theo tên, email, số thẻ...">
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" name="status">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="active" {% if status == 'active' %}selected{% endif %}>Đang hoạt động</option>
+                    <option value="expired" {% if status == 'expired' %}selected{% endif %}>Hết hạn</option>
+                    <option value="blocked" {% if status == 'blocked' %}selected{% endif %}>Bị khóa</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Tìm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Readers Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Số thẻ</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Ngày hết hạn</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reader in readers %}
+                    <tr>
+                        <td><strong>{{ reader.card_number }}</strong></td>
+                        <td>{{ reader.full_name }}</td>
+                        <td>{{ reader.email }}</td>
+                        <td>{{ reader.phone }}</td>
+                        <td>{{ reader.card_expiry_date.strftime('%d/%m/%Y') if reader.card_expiry_date else '-' }}</td>
+                        <td>
+                            {% if reader.card_expiry_date and reader.card_expiry_date >= today %}
+                                <span class="badge bg-success">Còn hạn</span>
+                            {% else %}
+                                <span class="badge bg-danger">Hết hạn</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('readers.detail', id=reader.id) }}" class="btn btn-sm btn-outline-info" title="Chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('readers.edit', id=reader.id) }}" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ reader.id }}" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ reader.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Xác nhận xóa</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Bạn có chắc chắn muốn xóa bạn đọc <strong>{{ reader.full_name }}</strong>?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <form method="post" action="{{ url_for('readers.delete', id=reader.id) }}" style="display: inline;">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-danger">Xóa</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <p>Không tìm thấy bạn đọc nào</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('readers.index', page=pagination.prev_num, q=q, status=status) }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('readers.index', page=page_num, q=q, status=status) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('readers.index', page=pagination.next_num, q=q, status=status) }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

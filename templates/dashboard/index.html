@@ -1,0 +1,236 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Dashboard - Thư viện MGX{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title animate__animated animate__fadeInDown">
+        <i class="fas fa-chart-line me-3"></i>Dashboard
+    </h1>
+    <p class="page-subtitle">Tổng quan hệ thống quản lý thư viện</p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 fw-semibold">Tổng số sách</p>
+                        <h2 class="mb-0 fw-bold" style="color: var(--primary-color);">{{ stats.total_books }}</h2>
+                        <small class="text-success">
+                            <i class="fas fa-check-circle"></i> {{ stats.books_available }} sách có sẵn
+                        </small>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3">
+                        <i class="fas fa-book fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 fw-semibold">Độc giả hoạt động</p>
+                        <h2 class="mb-0 fw-bold" style="color: var(--secondary-color);">{{ stats.total_readers }}</h2>
+                        <small class="text-muted">
+                            <i class="fas fa-users"></i> Thành viên
+                        </small>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded-3">
+                        <i class="fas fa-id-card fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 fw-semibold">Sách đang mượn</p>
+                        <h2 class="mb-0 fw-bold text-warning">{{ stats.total_borrowed }}</h2>
+                        <small class="text-muted">
+                            <i class="fas fa-exchange-alt"></i> Giao dịch
+                        </small>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-3">
+                        <i class="fas fa-book-reader fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1 fw-semibold">Sách quá hạn</p>
+                        <h2 class="mb-0 fw-bold text-danger">{{ stats.total_overdue }}</h2>
+                        <small class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> Cần xử lý
+                        </small>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 p-3 rounded-3">
+                        <i class="fas fa-clock fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Borrowed Books & Recent Borrows -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm animate__animated animate__fadeInLeft">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-fire text-danger me-2"></i>Sách được mượn nhiều nhất</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tên sách</th>
+                                <th class="text-center">Lượt mượn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book, count in top_books %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    <a href="{{ url_for('books.detail', id=book.id) }}" class="text-decoration-none fw-semibold">
+                                        {{ book.title }}
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">{{ count }}</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Chưa có dữ liệu</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm animate__animated animate__fadeInRight">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-history text-info me-2"></i>Hoạt động gần đây</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Độc giả</th>
+                                <th>Sách</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrow in recent_borrows %}
+                            <tr>
+                                <td>
+                                    <small class="fw-semibold">{{ borrow.reader.full_name }}</small>
+                                </td>
+                                <td>
+                                    <small>{{ borrow.book.title[:30] }}...</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ borrow.status|status_badge }}">{{ borrow.status }}</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Chưa có hoạt động</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overdue Books -->
+{% if overdue_borrows %}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm border-start border-danger border-5 animate__animated animate__fadeInUp">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold text-danger"><i class="fas fa-exclamation-circle me-2"></i>Sách quá hạn cần xử lý</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã thẻ</th>
+                                <th>Độc giả</th>
+                                <th>Sách</th>
+                                <th>Ngày mượn</th>
+                                <th>Hạn trả</th>
+                                <th>Quá hạn</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrow in overdue_borrows %}
+                            <tr>
+                                <td><span class="badge bg-secondary">{{ borrow.reader.card_number }}</span></td>
+                                <td class="fw-semibold">{{ borrow.reader.full_name }}</td>
+                                <td>{{ borrow.book.title }}</td>
+                                <td><small>{{ borrow.borrow_date|datetime }}</small></td>
+                                <td><small class="text-danger">{{ borrow.due_date|datetime }}</small></td>
+                                <td><span class="badge bg-danger">{{ borrow.days_overdue }} ngày</span></td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('borrows.return_book', id=borrow.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Xác nhận trả sách?')">
+                                            <i class="fas fa-check"></i> Trả
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}

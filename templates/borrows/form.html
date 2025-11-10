@@ -1,0 +1,125 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Tạo phiếu mượn sách{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('borrows.index') }}">Mượn/Trả sách</a></li>
+            <li class="breadcrumb-item active">Tạo phiếu mượn</li>
+        </ol>
+    </nav>
+    <h2>Tạo phiếu mượn sách</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.reader_id.label }} <span class="text-danger">*</span></label>
+                        {{ form.reader_id(class="form-select" + (" is-invalid" if form.reader_id.errors else "")) }}
+                        {% if form.reader_id.errors %}
+                            <div class="invalid-feedback">{{ form.reader_id.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.book_id.label }} <span class="text-danger">*</span></label>
+                        {{ form.book_id(class="form-select" + (" is-invalid" if form.book_id.errors else "")) }}
+                        {% if form.book_id.errors %}
+                            <div class="invalid-feedback">{{ form.book_id.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.borrow_date.label }} <span class="text-danger">*</span></label>
+                            {{ form.borrow_date(class="form-control" + (" is-invalid" if form.borrow_date.errors else "")) }}
+                            {% if form.borrow_date.errors %}
+                                <div class="invalid-feedback">{{ form.borrow_date.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.due_date.label }} <span class="text-danger">*</span></label>
+                            {{ form.due_date(class="form-control" + (" is-invalid" if form.due_date.errors else "")) }}
+                            {% if form.due_date.errors %}
+                                <div class="invalid-feedback">{{ form.due_date.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.notes.label }}</label>
+                        {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), rows=3) }}
+                        {% if form.notes.errors %}
+                            <div class="invalid-feedback">{{ form.notes.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Tạo phiếu mượn
+                        </button>
+                        <a href="{{ url_for('borrows.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-info-circle"></i> Lưu ý</h5>
+                <ul class="small">
+                    <li>Kiểm tra thẻ bạn đọc còn hạn</li>
+                    <li>Kiểm tra sách còn sẵn trong kho</li>
+                    <li>Thời hạn mượn mặc định: 14 ngày</li>
+                    <li>Mỗi bạn đọc được mượn tối đa 5 quyển</li>
+                    <li>Không cho mượn nếu đang có sách quá hạn</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-history"></i> Quy định</h5>
+                <div class="small">
+                    <p><strong>Phí quá hạn:</strong> 5.000đ/ngày/quyển</p>
+                    <p><strong>Gia hạn:</strong> Tối đa 2 lần, mỗi lần 14 ngày</p>
+                    <p><strong>Mất sách:</strong> Đền bù 200% giá trị</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Set default dates
+document.addEventListener('DOMContentLoaded', function() {
+    const borrowDate = document.querySelector('[name="borrow_date"]');
+    const dueDate = document.querySelector('[name="due_date"]');
+    
+    if (!borrowDate.value) {
+        const today = new Date().toISOString().split('T')[0];
+        borrowDate.value = today;
+    }
+    
+    if (!dueDate.value) {
+        const due = new Date();
+        due.setDate(due.getDate() + 14);
+        dueDate.value = due.toISOString().split('T')[0];
+    }
+});
+</script>
+{% endblock %}

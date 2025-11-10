@@ -1,0 +1,302 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Báo cáo & Thống kê{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Báo cáo & Thống kê</h2>
+
+<!-- Date Range Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Từ ngày</label>
+                <input type="date" class="form-control" name="start_date" value="{{ start_date }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Đến ngày</label>
+                <input type="date" class="form-control" name="end_date" value="{{ end_date }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> Lọc
+                </button>
+            </div>
+            <div class="col-md-3">
+                <a href="#" class="btn btn-success w-100" onclick="alert('Chức năng xuất Excel đang được phát triển'); return false;">
+                    <i class="fas fa-file-excel"></i> Xuất Excel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">Tổng sách</h6>
+                        <h3 class="mb-0">{{ stats.total_books }}</h3>
+                    </div>
+                    <i class="fas fa-book fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">Bạn đọc</h6>
+                        <h3 class="mb-0">{{ stats.total_readers }}</h3>
+                    </div>
+                    <i class="fas fa-users fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">Đang mượn</h6>
+                        <h3 class="mb-0">{{ stats.borrowed }}</h3>
+                    </div>
+                    <i class="fas fa-hand-holding fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">Quá hạn</h6>
+                        <h3 class="mb-0">{{ stats.overdue }}</h3>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-line"></i> Thống kê mượn sách theo tháng</h5>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="borrowTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-pie"></i> Top 10 sách được mượn nhiều nhất</h5>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="topBooksChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-bar"></i> Thống kê theo thể loại</h5>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="genreChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-user-graduate"></i> Top 10 bạn đọc mượn nhiều nhất</h5>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="topReadersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Reports -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-clock"></i> Sách quá hạn</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Sách</th>
+                                <th>Bạn đọc</th>
+                                <th>Quá hạn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for borrow in overdue_books[:10] %}
+                            <tr>
+                                <td>{{ borrow.book.title[:30] }}...</td>
+                                <td>{{ borrow.reader.full_name }}</td>
+                                <td><span class="badge bg-danger">{{ borrow.days_overdue }} ngày</span></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Không có sách quá hạn</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-box"></i> Sách sắp hết</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Tên sách</th>
+                                <th>Còn lại</th>
+                                <th>Tổng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in low_stock_books[:10] %}
+                            <tr>
+                                <td>{{ book.title[:30] }}...</td>
+                                <td><span class="badge bg-warning">{{ book.available_quantity }}</span></td>
+                                <td>{{ book.total_quantity }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Tất cả sách đều đủ số lượng</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Borrow Trend Chart
+fetch('{{ url_for("reports.borrow_trend_api") }}')
+    .then(res => res.json())
+    .then(data => {
+        new Chart(document.getElementById('borrowTrendChart'), {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Số lượt mượn',
+                    data: data.values,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+
+// Top Books Chart
+fetch('{{ url_for("reports.top_books_api") }}')
+    .then(res => res.json())
+    .then(data => {
+        new Chart(document.getElementById('topBooksChart'), {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Lượt mượn',
+                    data: data.values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+
+// Genre Chart
+fetch('{{ url_for("reports.genre_stats_api") }}')
+    .then(res => res.json())
+    .then(data => {
+        new Chart(document.getElementById('genreChart'), {
+            type: 'doughnut',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    data: data.values,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(153, 102, 255)',
+                        'rgb(255, 159, 64)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+
+// Top Readers Chart
+fetch('{{ url_for("reports.top_readers_api") }}')
+    .then(res => res.json())
+    .then(data => {
+        new Chart(document.getElementById('topReadersChart'), {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Lượt mượn',
+                    data: data.values,
+                    backgroundColor: 'rgba(153, 102, 255, 0.8)'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+</script>
+{% endblock %}
